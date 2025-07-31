@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
 import { MainProvider } from "./context/ContextAPI";
 import { DebounceProvider } from "./context/Debounce";
+import { ThemeToggleProvider } from "./context/ThemeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <MainProvider>
           <DebounceProvider>
-            {children}
+            <ThemeToggleProvider>
+              {children}
+              </ThemeToggleProvider>
             </DebounceProvider>
         </MainProvider>
       </body>

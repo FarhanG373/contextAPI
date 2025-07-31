@@ -2,11 +2,13 @@
 import { useContext, useState } from "react";
 import styles from "./page.module.scss";
 import { context } from './context/ContextAPI';
-import { debounceContext } from './context/Debounce'; // <-- Update import
+import { debounceContext } from './context/Debounce'; 
+import { ThemeToggleContext } from './context/ThemeToggle'; 
 
 export default function Home() {
   const { data, loading, error, postData } = useContext(context);
   const { debouncedValue, debounce } = useContext(debounceContext) ?? {};
+  const { isDarkMode, toggleTheme } = useContext(ThemeToggleContext) ?? {};
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -21,7 +23,9 @@ export default function Home() {
 
   return (
     <>
-      <div className={styles.page}>
+      <button onClick={() => toggleTheme && toggleTheme()}>Toggle</button>
+      <div>Current Theme: {isDarkMode ? 'Dark' : 'Light'}</div>
+      <div className={isDarkMode ? 'Dark' : 'Light'}>
       <main className={styles.main}>
         {data && data.map((user, index) => {
           return (
