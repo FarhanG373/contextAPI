@@ -2,8 +2,11 @@
 import { useContext, useState } from "react";
 import styles from "./page.module.scss";
 import { context } from './context/ContextAPI';
+import { debounceContext } from './context/Debounce'; // <-- Update import
+
 export default function Home() {
   const { data, loading, error, postData } = useContext(context);
+  const { debouncedValue, debounce } = useContext(debounceContext) ?? {};
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -15,8 +18,9 @@ export default function Home() {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-  
+
   return (
+    <>
       <div className={styles.page}>
       <main className={styles.main}>
         {data && data.map((user, index) => {
@@ -29,30 +33,40 @@ export default function Home() {
           );
         })}
         <div className={styles.form}>
-          <input type="text" placeholder="Name" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} />
+          <input
+            type="text"
+            placeholder="Name"
+            value={newUser.name}
+            onChange={(e) => {
+              setNewUser({ ...newUser, name: e.target.value });
+              debounce && debounce(e.target.value, 1000); // <-- Debounce call
+            }}
+          />
           <input type="email" placeholder="Email" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
           <input type="password" placeholder="Password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
           <input type="text" placeholder="Phone" value={newUser.phone} onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })} />
           <input type="text" placeholder="Surname" value={newUser.surname} onChange={(e) => setNewUser({ ...newUser, surname: e.target.value })} />
           <input type="text" placeholder="User Image URL" value={newUser.user_image} onChange={(e) => setNewUser({ ...newUser, user_image: e.target.value })} />
           <button
-  onClick={async () => {
-    await postData(newUser);
-    setNewUser({
-      name: '',
-      email: '',
-      password: '',
-      phone: '',
-      surname: '',
-      user_image: ''
-    });
-  }}
->
-  Create User
-</button>
+            onClick={async () => {
+              await postData(newUser);
+              setNewUser({
+                name: '',
+                email: '',
+                password: '',
+                phone: '',
+                surname: '',
+                user_image: ''
+              });
+            }}
+          >
+            Create User
+          </button>
+          {/* Example: Show debounced value */}
+          <div>Debounced Name: {debouncedValue}</div>
         </div>
       </main>
-    </div>
-    
+      </div>
+    </>
   );
 }
